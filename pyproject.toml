@@ -1,0 +1,7 @@
+[project]
+name = "voicesummary"
+version = "0.1.0"
+description = "LLM based voice summary tool"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
