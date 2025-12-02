@@ -10,7 +10,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str)
     Parse the speakers and transcript from the audio file.
     """
     logger = logging.getLogger(__name__)
-    device = "cuda"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     batch_size = 16  # reduce if low on GPU mem
     # change to "int8" if low on GPU mem (may reduce accuracy)
     compute_type = "float16"
