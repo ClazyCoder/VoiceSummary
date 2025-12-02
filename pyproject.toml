@@ -5,10 +5,20 @@ description = "LLM based voice summary tool"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "hf-xet>=1.2.0",
     "python-dotenv>=1.2.1",
     "whisperx",
+    "markupsafe>=2.0.0",
+    "torch>=2.7.0",
+    "torchvision>=0.22.0",
+    "torchaudio>=2.7.0",
 ]
 
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
 [tool.uv.sources]
-whisperx = { git = "https://github.com/m-bain/whisperX.git" }
+torch = { index = "pytorch-cu128"}
+torchvision = { index = "pytorch-cu128"}
+torchaudio = { index = "pytorch-cu128"}
