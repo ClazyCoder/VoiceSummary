@@ -89,3 +89,5 @@ dmypy.json
 *.bak
 *.swp
 
+# Test files
+test/
