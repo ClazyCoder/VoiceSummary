@@ -5,6 +5,7 @@ description = "LLM based voice summary tool"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "hf-xet>=1.2.0",
     "python-dotenv>=1.2.1",
     "whisperx",
 ]
