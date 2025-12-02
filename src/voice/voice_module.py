@@ -7,7 +7,22 @@ import logging
 
 def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str) -> list[dict]:
     """
-    Parse the speakers and transcript from the audio file.
+    Parses the speakers and transcript from the given audio file using WhisperX and diarization.
+
+    Args:
+        audio_path (str): Path to the audio file to be processed.
+        language (str): Language code for transcription (e.g., 'en', 'fr').
+        hf_token (str): Hugging Face authentication token for diarization model access.
+
+    Returns:
+        list[dict]: A list of segment dictionaries, each containing information about the transcript,
+            speaker labels, timestamps, and other metadata as returned by WhisperX.
+
+    Raises:
+        FileNotFoundError: If the audio file at `audio_path` does not exist or cannot be loaded.
+        ValueError: If the specified `language` is not supported.
+        RuntimeError: If authentication with Hugging Face using `hf_token` fails.
+        Exception: For other errors raised by WhisperX or diarization pipeline.
     """
     logger = logging.getLogger(__name__)
     device = "cuda" if torch.cuda.is_available() else "cpu"
