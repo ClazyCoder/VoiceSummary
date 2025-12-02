@@ -37,7 +37,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str)
     audio = whisperx.load_audio(audio_path)
     result = model.transcribe(audio, batch_size=batch_size)
     logger.info("Transcription completed!")
-    logger.info(result["segments"])  # before alignment
+    logger.debug(result["segments"])  # before alignment
 
     del model
     gc.collect()
@@ -49,7 +49,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str)
     result = whisperx.align(result["segments"], model_a,
                             metadata, audio, device, return_char_alignments=False)
     logger.info("Alignment completed!")
-    logger.info(result["segments"])  # after alignment
+    logger.debug(result["segments"])  # after alignment
 
     del model_a
     gc.collect()
@@ -64,6 +64,11 @@ def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str)
 
     logger.info("Diarization completed!")
     result = whisperx.assign_word_speakers(diarize_segments, result)
-    logger.info(diarize_segments)
-    logger.info(result["segments"])  # segments are now assigned speaker IDs
-    return result["segments"]
+    logger.debug(diarize_segments)
+    logger.debug(result["segments"])  # segments are now assigned speaker IDs
+    full_diarization = []
+    for segment in result["segments"]:
+        speaker = segment.get("speaker", "UNKNOWN")
+        text = segment['text'].strip()
+        full_diarization.append(f"{speaker}: {text}")
+    return full_diarization

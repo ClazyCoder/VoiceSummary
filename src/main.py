@@ -23,7 +23,9 @@ def main():
     result = parse_speakers_and_transcript(
         args.audio_path, args.language, hf_token)
     logger.info("Parsing completed!")
+    return result
 
 
 if __name__ == "__main__":
-    main()
+    result = main()
+    print(result)
