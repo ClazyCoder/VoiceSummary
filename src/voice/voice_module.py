@@ -17,8 +17,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         hf_token (str): Hugging Face authentication token for diarization model access.
 
     Returns:
-        list[dict]: A list of segment dictionaries, each containing information about the transcript,
-            speaker labels, timestamps, and other metadata as returned by WhisperX.
+        list[str]: A list of formatted strings, each in the form "{speaker}: {text}" representing the transcript and speaker label for each segment.
 
     Raises:
         FileNotFoundError: If the audio file at `audio_path` does not exist or cannot be loaded.
