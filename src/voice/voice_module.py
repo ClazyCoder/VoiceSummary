@@ -5,7 +5,7 @@ import torch
 import logging
 
 
-def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: int, max_speakers: int, hf_token: str) -> list[dict]:
+def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: int, max_speakers: int, hf_token: str) -> list[str]:
     """
     Parses the speakers and transcript from the given audio file using WhisperX and diarization.
 
