@@ -6,10 +6,10 @@ import logging
 
 
 def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str) -> list[dict]:
-    logger = logging.getLogger(__name__)
     """
     Parse the speakers and transcript from the audio file.
     """
+    logger = logging.getLogger(__name__)
     device = "cuda"
     batch_size = 16  # reduce if low on GPU mem
     # change to "int8" if low on GPU mem (may reduce accuracy)
