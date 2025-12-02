@@ -37,12 +37,13 @@ def validate_audio_path(audio_path: str) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description='VoiceSummary')
-    parser.add_argument('audio_path', type=str, help='Path to the audio file')
-    parser.add_argument('language', type=str,
+    parser.add_argument('--audio_path', type=str,
+                        help='Path to the audio file')
+    parser.add_argument('--language', type=str,
                         help='Language of the audio file')
-    parser.add_argument('min_speakers', type=int,
+    parser.add_argument('--min_speakers', type=int,
                         help='Minimum number of speakers to expect in the audio')
-    parser.add_argument('max_speakers', type=int,
+    parser.add_argument('--max_speakers', type=int,
                         help='Maximum number of speakers to expect in the audio')
     args = parser.parse_args()
     # Ensure the 'logs' directory exists before setting up logging
