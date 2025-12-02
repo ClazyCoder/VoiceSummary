@@ -4,4 +4,10 @@ version = "0.1.0"
 description = "LLM based voice summary tool"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "python-dotenv>=1.2.1",
+    "whisperx",
+]
+
+[tool.uv.sources]
+whisperx = { git = "https://github.com/m-bain/whisperX.git" }
