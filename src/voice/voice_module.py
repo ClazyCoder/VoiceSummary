@@ -5,13 +5,15 @@ import torch
 import logging
 
 
-def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str) -> list[dict]:
+def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: int, max_speakers: int, hf_token: str) -> list[dict]:
     """
     Parses the speakers and transcript from the given audio file using WhisperX and diarization.
 
     Args:
         audio_path (str): Path to the audio file to be processed.
         language (str): Language code for transcription (e.g., 'en', 'fr').
+        min_speakers (int): Minimum number of speakers to expect in the audio.
+        max_speakers (int): Maximum number of speakers to expect in the audio.
         hf_token (str): Hugging Face authentication token for diarization model access.
 
     Returns:
@@ -60,7 +62,8 @@ def parse_speakers_and_transcript(audio_path: str, language: str, hf_token: str)
         use_auth_token=hf_token, device=device)
 
     # add min/max number of speakers if known
-    diarize_segments = diarize_model(audio, min_speakers=4, max_speakers=4)
+    diarize_segments = diarize_model(
+        audio, min_speakers=min_speakers, max_speakers=max_speakers)
 
     logger.info("Diarization completed!")
     result = whisperx.assign_word_speakers(diarize_segments, result)

@@ -10,6 +10,10 @@ def main():
     parser.add_argument('audio_path', type=str, help='Path to the audio file')
     parser.add_argument('language', type=str,
                         help='Language of the audio file')
+    parser.add_argument('min_speakers', type=int,
+                        help='Minimum number of speakers to expect in the audio')
+    parser.add_argument('max_speakers', type=int,
+                        help='Maximum number of speakers to expect in the audio')
     args = parser.parse_args()
     # Ensure the 'logs' directory exists before setting up logging
     os.makedirs('logs', exist_ok=True)
@@ -23,7 +27,7 @@ def main():
     logger.info("Environment variables loaded!")
     logger.info("Parsing speakers and transcript...")
     result = parse_speakers_and_transcript(
-        args.audio_path, args.language, hf_token)
+        args.audio_path, args.language, args.min_speakers, args.max_speakers, hf_token)
     logger.info("Parsing completed!")
     return result
 
