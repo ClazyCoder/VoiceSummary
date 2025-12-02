@@ -11,6 +11,8 @@ def main():
     parser.add_argument('language', type=str,
                         help='Language of the audio file')
     args = parser.parse_args()
+    # Ensure the 'logs' directory exists before setting up logging
+    os.makedirs('logs', exist_ok=True)
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         handlers=[logging.StreamHandler(), logging.FileHandler('logs/voicesummary.log')])
