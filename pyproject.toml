@@ -16,6 +16,7 @@ dependencies = [
     "langchain-community>=0.4.1",
     "llama-cpp-python>=0.3.16",
     "huggingface-hub>=0.36.0",
+    "langchain-ollama>=1.0.0",
 ]
 
 [[tool.uv.index]]
