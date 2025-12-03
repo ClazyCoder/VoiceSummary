@@ -1,67 +1,59 @@
-from huggingface_hub import snapshot_download
+# from huggingface_hub import hf_hub_download # TODO : future
 import os
 import logging
-from langchain_community.chat_models import ChatLlamaCpp
-
+from langchain_ollama import ChatOllama
+import glob
+from .template_manager import TemplateManager
 
 logger = logging.getLogger(__name__)
-
-
-prompt_template = """
-You are a helpful assistant that summarizes transcripts of meetings.
-You will be given a list of transcripts and you will need to summarize them.
-User uses {language} in the transcript.
-The participants of the meeting is appeared in the transcript as "SPEAKER_00", "SPEAKER_01", ... and if the speaker is unknown, "UNKNOWN".
-You will need to use the following user's transcript:
-{transcript}
-
-Return the summary in the following template:
-{summary_template}
-/no_think
-"""
-
-summary_template = """
-# Head (Main Content of the transcript)
-...
-# Summary (Summary of the transcript)
-...
-# Participants (Participants of the transcript if their names are appeared in the transcript)
-...
-# Conclusion (Conclusion of the transcript)
-...
-# Notes (Notes of the transcript)
-...
-# Important Points (Important texts of the transcript)
-...
-"""
 
 
 class LLMModule:
     def __init__(self, model_name: str):
         self.model_name = model_name
         self.model = None
-        self.model_path = os.join(
-            os.getenv("MODEL_DIR", "./models"), self.model_name)
-        if not os.path.exists(self.model_path):
-            self.download_llm_model()
-        self.model = ChatLlamaCpp(model_path=self.model_name, think=False, temperature=0.7, top_p=0.8,
-                                  top_k=20, min_p=0.0, presence_penalty=0.0, frequency_penalty=0.0,
-                                  repetition_penalty=1.5, )
-
-    def download_llm_model(self) -> None:
-        hf_token = os.getenv("HF_TOKEN")
-        if not hf_token:
-            raise ValueError("HF_TOKEN is not set")
-        logger.info(f"Downloading LLM model: {self.model_name}")
-        MODEL_DIR = os.getenv("MODEL_DIR", "./models")
-        if not os.path.exists(MODEL_DIR):
-            os.makedirs(MODEL_DIR)
-        snapshot_download(self.model_name, local_dir=MODEL_DIR,
-                          use_auth_token=hf_token)
-        logger.info(f"LLM model downloaded successfully: {self.model_name}")
+        # TODO : Download LLM model from Hugging Face in Local inference mode.
+        # self.model_path = os.path.join(
+        #     os.getenv("MODEL_DIR", "./models"), self.model_name)
+        # if not os.path.exists(self.model_path) and os.getenv("DOWNLOAD_MODEL", "true").lower() == "true":
+        #     self.download_llm_model() # TODO : Download LLM model from Hugging Face in Local inference mode.
+        self.template_manager = TemplateManager(
+            base_dir=os.getenv("PROMPTS_DIR", "src/prompts"))
+        model_type = os.getenv("MODEL_TYPE", "ollama")
+        if model_type == "ollama":
+            self.model = ChatOllama(model=self.model_name, base_url=os.getenv(
+                "OLLAMA_BASE_URL", "http://localhost:11434"))
+        # TODO : Add other model types here.
+        elif model_type == "chatgpt":
+            raise NotImplementedError("ChatGPT model is not implemented yet.")
+        elif model_type == "groq":
+            raise NotImplementedError("Groq model is not implemented yet.")
+        elif model_type == "gemini":
+            raise NotImplementedError("Gemini model is not implemented yet.")
+        elif model_type == "claude":
+            raise NotImplementedError("Claude model is not implemented yet.")
+        else:
+            raise ValueError(f"Invalid model type: {model_type}")
+    # TODO : Download LLM model from Hugging Face in Local inference mode.
+    # def download_llm_model(self) -> None:
+    #     hf_token = os.getenv("HF_TOKEN")
+    #     repo_id = os.getenv("HF_MODEL_REPO", "Qwen3-8B-GGUF")
+    #     if not hf_token:
+    #         raise ValueError("HF_TOKEN is not set")
+    #     if not repo_id:
+    #         raise ValueError("HF_MODEL_REPO is not set")
+    #     logger.info(f"Downloading LLM model: {repo_id} / {self.model_name}")
+    #     MODEL_DIR = os.getenv("MODEL_DIR", "./models")
+    #     if not os.path.exists(MODEL_DIR):
+    #         os.makedirs(MODEL_DIR)
+    #     hf_hub_download(repo_id=repo_id,  local_dir=self.model_path, filename=self.model_name,
+    #                     use_auth_token=hf_token)
+    #     logger.info(f"LLM model downloaded successfully: {self.model_name}")
 
     def summarize_transcript(self, transcript: list[str], language: str) -> str:
-        logger.info(f"Summarizing transcript: {transcript}")
-        response = self.model.invoke(prompt_template.format(
-            transcript=transcript, summary_template=summary_template, language=language))
+        logger.debug(f"Summarizing transcript: {transcript}")
+        chain = self.template_manager.get_composed_prompt(
+            language) | self.model
+        response = chain.invoke(
+            {"transcript": transcript, "language": language})
         return response.content
