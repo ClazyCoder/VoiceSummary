@@ -49,7 +49,7 @@ def save_result(result: str, language: str, audio_path: str, time_stamp: str, re
     """
     Saves the result to the results directory.
     """
-    result_file_name = f"{result_type}_{language}_{os.path.basename(audio_path).split('.')[0]}_{time_stamp}.{ext}"
+    result_file_name = f"{result_type}_{language}_{Path(audio_path).stem}_{time_stamp}.{ext}"
     with open(os.path.join(os.getenv("RESULTS_DIR", "results"), result_file_name), "w", encoding="utf-8") as f:
         f.write(result)
 
