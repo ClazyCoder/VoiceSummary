@@ -80,13 +80,15 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
     except ValueError:
         raise ValueError(
             f"BATCH_SIZE must be a number. Current value: {os.getenv('BATCH_SIZE')}")
-    try:
-        # change to "int8" if low on GPU mem (may reduce accuracy)
-        compute_type = os.getenv("COMPUTE_TYPE", "float16")
-    except ValueError:
+    if batch_size < 1:
         raise ValueError(
-            f"COMPUTE_TYPE must be a valid compute type. Current value: {os.getenv('COMPUTE_TYPE')}")
-
+            f"BATCH_SIZE must be a positive integer. Current value: {batch_size}")
+    # change to "int8" if low on GPU mem (may reduce accuracy)
+    compute_type = os.getenv("COMPUTE_TYPE", "float16")
+    valid_compute_types = {"float16", "float32", "int8"}
+    if compute_type not in valid_compute_types:
+        raise ValueError(
+            f"COMPUTE_TYPE must be one of {valid_compute_types}. Current value: {compute_type}")
     try:
         # 1. Transcribe with original whisper (batched)
         logger.info(f"Loading WhisperX model for language: {language}")
