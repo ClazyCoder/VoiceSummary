@@ -58,6 +58,16 @@ def main():
                         handlers=[logging.StreamHandler(), logging.FileHandler('logs/voicesummary.log')])
     logger.info("VoiceSummary started!")
 
+    # Validate language parameter
+    supported_languages = {"en", "fr", "de", "es",
+                           "it", "pt", "nl", "pl", "ru", "zh", "ja"}
+    if args.language.lower() not in supported_languages:
+        logger.error(
+            f"Unsupported language: {args.language}. Supported languages: {', '.join(sorted(supported_languages))}"
+        )
+        raise ValueError(
+            f"Unsupported language: {args.language}. Supported languages: {', '.join(sorted(supported_languages))}"
+        )
     # Validate audio file path
     try:
         logger.info(f"Validating audio file path: {args.audio_path}")
