@@ -12,7 +12,7 @@ def format_transcript(segments):
     1. Merging consecutive utterances from the same speaker
     2. Converting to a clean transcript format (String)
     """
-    if not segments:
+    if not segments or not all('text' in seg for seg in segments):
         return ""
 
     formatted_lines = []
