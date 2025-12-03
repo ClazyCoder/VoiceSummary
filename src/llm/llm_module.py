@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 prompt_template = """
 You are a helpful assistant that summarizes transcripts of meetings.
 You will be given a list of transcripts and you will need to summarize them.
+User uses {language} in the transcript.
 The participants of the meeting is appeared in the transcript as "SPEAKER_00", "SPEAKER_01", ... and if the speaker is unknown, "UNKNOWN".
 You will need to use the following user's transcript:
 {transcript}
@@ -19,7 +20,7 @@ Return the summary in the following template:
 /no_think
 """
 
-summary_template = f"""
+summary_template = """
 # Head (Main Content of the transcript)
 ...
 # Summary (Summary of the transcript)
@@ -48,15 +49,19 @@ class LLMModule:
                                   repetition_penalty=1.5, )
 
     def download_llm_model(self) -> None:
+        hf_token = os.getenv("HF_TOKEN")
+        if not hf_token:
+            raise ValueError("HF_TOKEN is not set")
         logger.info(f"Downloading LLM model: {self.model_name}")
         MODEL_DIR = os.getenv("MODEL_DIR", "./models")
         if not os.path.exists(MODEL_DIR):
             os.makedirs(MODEL_DIR)
-        snapshot_download(self.model_name, local_dir=MODEL_DIR)
+        snapshot_download(self.model_name, local_dir=MODEL_DIR,
+                          use_auth_token=hf_token)
         logger.info(f"LLM model downloaded successfully: {self.model_name}")
 
-    def summarize_transcript(self, transcript: list[str]) -> str:
+    def summarize_transcript(self, transcript: list[str], language: str) -> str:
         logger.info(f"Summarizing transcript: {transcript}")
         response = self.model.invoke(prompt_template.format(
-            transcript=transcript, summary_template=summary_template))
+            transcript=transcript, summary_template=summary_template, language=language))
         return response.content
