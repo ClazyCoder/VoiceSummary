@@ -90,7 +90,8 @@ def main():
             args.audio_path, args.language, args.min_speakers, args.max_speakers, hf_token)
         logger.info("Parsing completed!")
         logger.info("Saving transcript to results directory...")
-        transcript_file_name = f"transcript_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        transcript_file_name = f"transcript_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{time_stamp}.txt"
         with open(os.path.join(os.getenv("RESULTS_DIR", "results"), transcript_file_name), "w", encoding="utf-8") as f:
             f.write(transcripts)
         logger.info("Transcript saved to results directory!")
@@ -101,7 +102,7 @@ def main():
         logger.info("Summary completed!")
 
         logger.info("Saving summary to results directory...")
-        summary_file_name = f"summary_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        summary_file_name = f"summary_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{time_stamp}.md"
         with open(os.path.join(os.getenv("RESULTS_DIR", "results"), summary_file_name), "w", encoding="utf-8") as f:
             f.write(summary)
         logger.info("Summary saved to results directory!")
