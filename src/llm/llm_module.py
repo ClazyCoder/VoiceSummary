@@ -39,6 +39,10 @@ class LLMModule:
         logger.debug(f"Summarizing transcript: {transcript}")
         chain = self.template_manager.get_composed_prompt(
             language) | self.model
-        response = chain.invoke(
-            {"transcript": transcript, "language": language})
-        return response.content
+        try:
+            response = chain.invoke(
+                {"transcript": transcript, "language": language})
+            return response.content
+        except Exception as e:
+            logger.error(f"LLM invocation failed: {e}", exc_info=True)
+            return f"Error: LLM invocation failed. Details: {str(e)}"
