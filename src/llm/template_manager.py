@@ -42,6 +42,8 @@ class TemplateManager:
         return self.system_prompt
 
     def get_summary_template(self, language: str) -> str:
+        if language not in self.templates:
+            logger.warning(f"Template for language '{language}' not found, falling back to English")
         return self.templates.get(language, self.templates.get('en', ""))
 
     def get_composed_prompt(self, language: str) -> PromptTemplate:
