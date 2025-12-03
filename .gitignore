@@ -91,3 +91,4 @@ dmypy.json
 
 # Test files
 test/
+models/ # LLM models
