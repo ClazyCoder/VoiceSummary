@@ -85,7 +85,7 @@ def main():
             f.write(transcripts)
         logger.info("Transcript saved to results directory!")
 
-        model_name = os.getenv("LLM_MODEL", "qwen3")
+        model_name = os.getenv("LLM_MODEL", "qwen3:8b")
         llm_module = LLMModule(model_name)
         summary = llm_module.summarize_transcript(transcripts, args.language)
         logger.info("Summary completed!")

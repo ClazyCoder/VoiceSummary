@@ -26,7 +26,7 @@ uv sync
 3. Ollama 설치 및 모델 다운로드:
 ```bash
 # Ollama 설치 (https://ollama.ai/)
-ollama pull qwen2.5:7b  # 또는 원하는 모델
+ollama pull qwen3:8b  # 또는 원하는 모델
 ```
 
 ## 환경 변수 설정
@@ -37,8 +37,8 @@ ollama pull qwen2.5:7b  # 또는 원하는 모델
 # 필수: Hugging Face 토큰
 HF_TOKEN=your_huggingface_token_here
 
-# 선택: LLM 모델 설정 (기본값: qwen2.5)
-LLM_MODEL=qwen2.5:7b
+# 선택: LLM 모델 설정 (기본값: qwen3)
+LLM_MODEL=qwen3:8b
 
 # 선택: Ollama 서버 URL (기본값: http://localhost:11434)
 OLLAMA_BASE_URL=http://localhost:11434
