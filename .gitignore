@@ -89,3 +89,13 @@ dmypy.json
 *.bak
 *.swp
 
+# Test files
+test/
+
+# LLM models
+models/
+models/*
+
+# Results
+results/
+results/*

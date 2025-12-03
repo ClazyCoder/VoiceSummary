@@ -1,0 +1,21 @@
+# 📑 Titre
+(Veuillez fournir un titre concis représentant le thème central de la transcription.)
+
+# 📝 Résumé Exécutif
+(Résumez le contenu global en un paragraphe cohérent.)
+
+# 👥 Analyse des Participants
+(Listez les intervenants en les identifiant comme SPEAKER_XX, etc., et décrivez brièvement leur position ou leur rôle si possible.)
+
+# 🔑 Points Clés de la Discussion
+(Extrayez les sujets les plus significatifs discutés.)
+- [Point 1]
+- ...
+
+# 🚀 Conclusion et Actions à Entreprendre
+(Listez les conclusions atteintes, les décisions prises ou les actions futures prévues.)
+- [Conclusion/Action 1]
+- ...
+
+# 💡 Notes Importantes
+(Notez les termes spécifiques, les chiffres, les dates ou les détails cruciaux à ne pas manquer.)
