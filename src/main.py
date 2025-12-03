@@ -83,7 +83,7 @@ def main():
         logger.debug(summary)
         return summary
     except Exception as e:
-        logger.error(f"오디오 파일 처리 중 오류가 발생했습니다: {e}", exc_info=True)
+        logger.error(f"오디오 파일 요약 중 오류가 발생했습니다: {e}", exc_info=True)
         raise
 
 
