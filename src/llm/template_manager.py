@@ -41,16 +41,16 @@ class TemplateManager:
     def get_system_prompt(self) -> str:
         return self.system_prompt
 
-    def get_summary_template(self, lang_code: str) -> str:
-        return self.templates.get(lang_code, self.templates.get('en', ""))
+    def get_summary_template(self, language: str) -> str:
+        return self.templates.get(language, self.templates.get('en', ""))
 
-    def get_composed_prompt(self, lang_code: str) -> PromptTemplate:
+    def get_composed_prompt(self, language: str) -> PromptTemplate:
         """
         Compose the system prompt with the summary template for the given language and return it
         """
         # 1. Get the template for the given language (if not found, use English, if not found, use empty string)
         target_template = self.templates.get(
-            lang_code, self.templates.get('en', ""))
+            language, self.templates.get('en', ""))
 
         # 2. Create a LangChain PromptTemplate object
         # Note: system.txt contains {transcript}, {language}, {summary_template} variables
