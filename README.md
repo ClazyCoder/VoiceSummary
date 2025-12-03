@@ -183,7 +183,7 @@ VoiceSummary/
 - 지정한 모델이 다운로드되어 있는지 확인하세요: `ollama list`
 
 ### GPU 메모리 부족
-- `voice_module.py`의 `batch_size`를 줄이거나 `compute_type`을 `"int8"`로 변경하세요.
+- `.env` 파일에서 `BATCH_SIZE` 환경 변수를 더 낮은 값으로 설정하거나 `COMPUTE_TYPE`을 `"int8"`로 변경하세요.
 - 더 작은 LLM 모델을 사용하세요.
 
 ### 파일을 찾을 수 없음
