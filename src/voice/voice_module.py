@@ -87,7 +87,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         # 1. Transcribe with original whisper (batched)
         logger.info(f"Loading WhisperX model for language: {language}")
         model = whisperx.load_model(
-            "large-v2", device, compute_type=compute_type, language=language)
+            os.getenv("WHISPERX_MODEL", "large-v2"), device, compute_type=compute_type, language=language)
 
         logger.info(f"Loading audio file: {audio_path}")
         audio = whisperx.load_audio(audio_path)
