@@ -37,6 +37,15 @@ def validate_audio_path(audio_path: str) -> None:
         )
 
 
+def save_result(result: str, language: str, audio_path: str, time_stamp: str, result_type: str, ext: str) -> None:
+    """
+    Saves the result to the results directory.
+    """
+    result_file_name = f"{result_type}_{language}_{os.path.basename(audio_path).split('.')[0]}_{time_stamp}.{ext}"
+    with open(os.path.join(os.getenv("RESULTS_DIR", "results"), result_file_name), "w", encoding="utf-8") as f:
+        f.write(result)
+
+
 def main():
     parser = argparse.ArgumentParser(description='VoiceSummary')
     parser.add_argument('--audio_path', type=str,
@@ -89,25 +98,19 @@ def main():
         transcripts = parse_speakers_and_transcript(
             args.audio_path, args.language, args.min_speakers, args.max_speakers, hf_token)
         logger.info("Parsing completed!")
-        logger.info("Saving transcript to results directory...")
         time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        transcript_file_name = f"transcript_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{time_stamp}.txt"
-        with open(os.path.join(os.getenv("RESULTS_DIR", "results"), transcript_file_name), "w", encoding="utf-8") as f:
-            f.write(transcripts)
+        logger.info("Saving transcript to results directory...")
+        save_result(transcripts, args.language, args.audio_path,
+                    time_stamp, "transcript", "txt")
         logger.info("Transcript saved to results directory!")
-
         model_name = os.getenv("LLM_MODEL", "qwen3:8b")
         llm_module = LLMModule(model_name)
         summary = llm_module.summarize_transcript(transcripts, args.language)
         logger.info("Summary completed!")
-
         logger.info("Saving summary to results directory...")
-        summary_file_name = f"summary_{args.language}_{os.path.basename(args.audio_path).split('.')[0]}_{time_stamp}.md"
-        with open(os.path.join(os.getenv("RESULTS_DIR", "results"), summary_file_name), "w", encoding="utf-8") as f:
-            f.write(summary)
+        save_result(summary, args.language, args.audio_path,
+                    time_stamp, "summary", "md")
         logger.info("Summary saved to results directory!")
-        logger.debug(summary)
-
         return summary
     except Exception as e:
         logger.error(
