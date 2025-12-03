@@ -12,6 +12,11 @@ dependencies = [
     "torchvision>=0.22.0",
     "torchaudio>=2.7.0",
     "hf-xet>=1.2.0",
+    "langchain>=1.1.0",
+    "langchain-community>=0.4.1",
+    "llama-cpp-python>=0.3.16",
+    "huggingface-hub>=0.36.0",
+    "langchain-ollama>=1.0.0",
 ]
 
 [[tool.uv.index]]

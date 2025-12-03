@@ -5,7 +5,38 @@ import torch
 import logging
 
 
-def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: int, max_speakers: int, hf_token: str) -> list[str]:
+def format_transcript(segments):
+    """
+    WhisperX 결과(segments)를 받아서
+    1. 같은 화자의 연속된 발언은 합치고
+    2. 깔끔한 대본 형식(String)으로 변환
+    """
+    if not segments:
+        return ""
+
+    formatted_lines = []
+
+    current_speaker = segments[0].get('speaker', 'UNKNOWN')
+    current_text = [segments[0]['text'].strip()]
+
+    for seg in segments[1:]:
+        speaker = seg.get('speaker', 'UNKNOWN')
+        text = seg['text'].strip()
+
+        if speaker == current_speaker:
+            current_text.append(text)
+        else:
+            formatted_lines.append(
+                f"{current_speaker}: {' '.join(current_text)}")
+            current_speaker = speaker
+            current_text = [text]
+
+    formatted_lines.append(f"{current_speaker}: {' '.join(current_text)}")
+
+    return "\n\n".join(formatted_lines)
+
+
+def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: int, max_speakers: int, hf_token: str) -> str:
     """
     Parses the speakers and transcript from the given audio file using WhisperX and diarization.
 
@@ -17,7 +48,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         hf_token (str): Hugging Face authentication token for diarization model access.
 
     Returns:
-        list[str]: A list of formatted strings, each in the form "{speaker}: {text}" representing the transcript and speaker label for each segment.
+        str: A formatted string containing the transcript with speaker labels, where each line is in the form "{speaker}: {text}". Multiple segments from the same speaker are merged, and segments are separated by double newlines.
 
     Raises:
         FileNotFoundError: If the audio file at `audio_path` does not exist or cannot be loaded.
@@ -96,11 +127,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         logger.debug(diarize_segments)
         # segments are now assigned speaker IDs
         logger.debug(result["segments"])
-        full_diarization = []
-        for segment in result["segments"]:
-            speaker = segment.get("speaker", "UNKNOWN")
-            text = segment['text'].strip()
-            full_diarization.append(f"{speaker}: {text}")
+        full_diarization = format_transcript(result["segments"])
         return full_diarization
 
     except FileNotFoundError as e:

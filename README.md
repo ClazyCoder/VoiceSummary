@@ -1,6 +1,6 @@
 # VoiceSummary
 
-LLM 기반 음성 요약 도구로, 오디오 파일에서 화자 분리(diarization)와 전사(transcription)를 수행합니다.
+LLM 기반 음성 요약 도구로, 오디오 파일에서 화자 분리(diarization), 전사(transcription), 그리고 AI 기반 요약을 수행합니다.
 
 ## 요구사항
 
@@ -8,6 +8,7 @@ LLM 기반 음성 요약 도구로, 오디오 파일에서 화자 분리(diariza
 - [uv](https://github.com/astral-sh/uv) 패키지 관리자
 - Hugging Face 토큰 (화자 분리 모델 접근용)
 - CUDA 지원 GPU
+- [Ollama](https://ollama.ai/) (LLM 요약 기능 사용 시)
 
 ## 설치
 
@@ -22,12 +23,34 @@ cd VoiceSummary
 uv sync
 ```
 
+3. Ollama 설치 및 모델 다운로드:
+```bash
+# Ollama 설치 (https://ollama.ai/)
+ollama pull qwen3:8b  # 또는 원하는 모델
+```
+
 ## 환경 변수 설정
 
-프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 Hugging Face 토큰을 추가하세요:
+프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 다음 환경 변수를 설정하세요:
 
 ```env
+# 필수: Hugging Face 토큰
 HF_TOKEN=your_huggingface_token_here
+
+# 선택: LLM 모델 설정 (기본값: qwen3)
+LLM_MODEL=qwen3:8b
+
+# 선택: Ollama 서버 URL (기본값: http://localhost:11434)
+OLLAMA_BASE_URL=http://localhost:11434
+
+# 선택: 모델 타입 (기본값: ollama)
+MODEL_TYPE=ollama
+
+# 선택: 결과 저장 디렉토리 (기본값: results)
+RESULTS_DIR=results
+
+# 선택: 프롬프트 템플릿 디렉토리 (기본값: src/prompts)
+PROMPTS_DIR=src/prompts
 ```
 
 Hugging Face 토큰은 [Hugging Face 설정 페이지](https://huggingface.co/settings/tokens)에서 발급받을 수 있습니다.
@@ -49,30 +72,83 @@ uv run python src/main.py --audio_path <오디오_파일_경로> --language <언
 
 - `--audio_path` (필수): 처리할 오디오 파일의 경로
 - `--language` (선택): 오디오 파일의 언어 코드 (기본값: `en`)
-  - 예: `en` (영어), `ko` (한국어), `ja` (일본어), `fr` (프랑스어) 등
+  - 예: `en` (영어), `ko` (한국어), `ja` (일본어), `fr` (프랑스어), `zh` (중국어) 등
 - `--min_speakers` (선택): 예상되는 최소 화자 수 (기본값: `1`)
 - `--max_speakers` (선택): 예상되는 최대 화자 수 (기본값: `4`)
 
 ### 사용 예시
 
-#### 영어 회의록 전사
+#### 영어 회의록 전사 및 요약
 ```bash
 uv run python src/main.py --audio_path test/test_meeting.mp3 --language en --min_speakers 2 --max_speakers 5
 ```
 
-#### 한국어 인터뷰 전사
+#### 한국어 인터뷰 전사 및 요약
 ```bash
 uv run python src/main.py --audio_path test/test_interview.mp3 --language ko --min_speakers 1 --max_speakers 2
 ```
 
 ## 출력 형식
 
-프로그램은 각 세그먼트에 대해 다음과 같은 형식으로 결과를 출력합니다:
+### 전사 결과
+
+프로그램은 각 세그먼트에 대해 다음과 같은 형식으로 전사 결과를 생성합니다:
 
 ```
 SPEAKER_00: 첫 번째 화자가 말한 내용입니다.
 SPEAKER_01: 두 번째 화자가 말한 내용입니다.
 SPEAKER_00: 다시 첫 번째 화자가 말한 내용입니다.
+```
+
+### 요약 결과
+
+LLM을 통해 생성된 요약은 마크다운 형식으로 제공되며, 다음 구조를 포함합니다:
+
+- 📑 **제목**: 대화의 핵심 주제
+- 📝 **요약**: 전체 내용의 논리적 요약
+- 👥 **참여자 분석**: 각 화자의 역할과 입장 분석
+- 🔑 **핵심 논의 사항**: 주요 토픽을 불릿 포인트로 정리
+- 🚀 **결론 및 실행 계획**: 결론 및 향후 계획
+- 💡 **중요 참고 사항**: 숫자, 용어, 날짜 등 중요 정보
+
+## 결과 파일 저장
+
+프로그램 실행 시 다음 파일들이 `results` 디렉토리(또는 `RESULTS_DIR` 환경 변수로 지정한 디렉토리)에 자동으로 저장됩니다:
+
+- `transcript_{언어}_{파일명}_{타임스탬프}.txt`: 전사 결과
+- `summary_{언어}_{파일명}_{타임스탬프}.md`: 요약 결과 (마크다운 형식)
+
+예시:
+```
+results/
+├── transcript_ko_test_meeting_20251203_155412.txt
+└── summary_ko_test_meeting_20251203_155611.md
+```
+
+## 프로젝트 구조
+
+```
+VoiceSummary/
+├── src/
+│   ├── main.py                    # 메인 실행 파일
+│   ├── voice/
+│   │   └── voice_module.py        # 음성 처리 모듈 (WhisperX, 화자 분리)
+│   ├── llm/
+│   │   ├── llm_module.py          # LLM 모듈 (요약 생성)
+│   │   └── template_manager.py    # 프롬프트 템플릿 관리
+│   └── prompts/
+│       ├── system.txt             # 시스템 프롬프트
+│       └── templates/             # 언어별 요약 템플릿
+│           ├── en.txt            # 영어 템플릿
+│           ├── ko.txt            # 한국어 템플릿
+│           ├── ja.txt            # 일본어 템플릿
+│           ├── fr.txt            # 프랑스어 템플릿
+│           └── zh.txt            # 중국어 템플릿
+├── test/                          # 테스트용 오디오 파일
+├── results/                       # 전사 및 요약 결과 저장 디렉토리
+├── logs/                          # 로그 파일 저장 디렉토리
+├── pyproject.toml                 # 프로젝트 설정 및 의존성
+└── README.md                      # 프로젝트 문서
 ```
 
 ## 로그
@@ -87,9 +163,23 @@ SPEAKER_00: 다시 첫 번째 화자가 말한 내용입니다.
 - `.env` 파일에 올바른 `HF_TOKEN`이 설정되어 있는지 확인하세요.
 - 토큰이 유효하고 화자 분리 모델 접근 권한이 있는지 확인하세요.
 
+### Ollama 연결 오류
+- Ollama가 실행 중인지 확인하세요: `ollama serve`
+- `OLLAMA_BASE_URL` 환경 변수가 올바르게 설정되어 있는지 확인하세요.
+- 지정한 모델이 다운로드되어 있는지 확인하세요: `ollama list`
+
 ### GPU 메모리 부족
 - `voice_module.py`의 `batch_size`를 줄이거나 `compute_type`을 `"int8"`로 변경하세요.
+- 더 작은 LLM 모델을 사용하세요.
 
 ### 파일을 찾을 수 없음
 - 오디오 파일 경로가 올바른지 확인하세요.
 - 상대 경로 사용 시 현재 작업 디렉토리를 확인하세요.
+
+### 요약 템플릿이 없음
+- `src/prompts/templates/` 디렉토리에 해당 언어의 템플릿 파일이 있는지 확인하세요.
+- 없으면 영어 템플릿(`en.txt`)이 기본으로 사용됩니다.
+
+## 라이선스
+
+이 프로젝트는 Apache License 2.0 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
