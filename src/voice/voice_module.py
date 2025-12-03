@@ -48,7 +48,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         hf_token (str): Hugging Face authentication token for diarization model access.
 
     Returns:
-        list[str]: A list of formatted strings, each in the form "{speaker}: {text}" representing the transcript and speaker label for each segment.
+        str: A formatted string containing the transcript with speaker labels, where each line is in the form "{speaker}: {text}". Multiple segments from the same speaker are merged, and segments are separated by double newlines.
 
     Raises:
         FileNotFoundError: If the audio file at `audio_path` does not exist or cannot be loaded.
