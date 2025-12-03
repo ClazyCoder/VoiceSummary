@@ -10,30 +10,30 @@ from datetime import datetime
 
 def validate_audio_path(audio_path: str) -> None:
     """
-    오디오 파일 경로의 유효성을 검사합니다.
+    Validates the audio file path.
 
     Args:
-        audio_path (str): 검사할 오디오 파일 경로
+        audio_path (str): Audio file path to validate
 
     Raises:
-        FileNotFoundError: 파일이 존재하지 않을 경우
-        ValueError: 파일 확장자가 지원되지 않거나 파일이 아닌 경우
+        FileNotFoundError: If the file does not exist
+        ValueError: If the file extension is not supported or the path is not a file
     """
     path = Path(audio_path)
 
     if not path.exists():
-        raise FileNotFoundError(f"오디오 파일을 찾을 수 없습니다: {audio_path}")
+        raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
     if not path.is_file():
-        raise ValueError(f"지정된 경로가 파일이 아닙니다: {audio_path}")
+        raise ValueError(f"The specified path is not a file: {audio_path}")
 
-    # 지원되는 오디오 파일 확장자
+    # Supported audio file extensions
     supported_extensions = {'.mp3', '.wav', '.m4a',
                             '.flac', '.ogg', '.opus', '.aac', '.wma'}
     if path.suffix.lower() not in supported_extensions:
         raise ValueError(
-            f"지원되지 않는 오디오 파일 형식입니다: {path.suffix}. "
-            f"지원되는 형식: {', '.join(supported_extensions)}"
+            f"Unsupported audio file format: {path.suffix}. "
+            f"Supported formats: {', '.join(supported_extensions)}"
         )
 
 
@@ -58,20 +58,20 @@ def main():
                         handlers=[logging.StreamHandler(), logging.FileHandler('logs/voicesummary.log')])
     logger.info("VoiceSummary started!")
 
-    # 오디오 파일 경로 유효성 검사
+    # Validate audio file path
     try:
         logger.info(f"Validating audio file path: {args.audio_path}")
         validate_audio_path(args.audio_path)
         logger.info("Audio file path is valid!")
     except (FileNotFoundError, ValueError) as e:
-        logger.error(f"오디오 파일 경로 검증 실패: {e}")
+        logger.error(f"Audio file path validation failed: {e}")
         raise
 
     logger.info("Loading environment variables...")
     hf_token = os.getenv("HF_TOKEN")
     if not hf_token:
-        logger.error("HF_TOKEN 환경 변수가 설정되지 않았습니다.")
-        raise ValueError("HF_TOKEN 환경 변수가 필요합니다.")
+        logger.error("HF_TOKEN environment variable is not set.")
+        raise ValueError("HF_TOKEN environment variable is required.")
     logger.info("Environment variables loaded!")
     logger.info("Parsing speakers and transcript...")
 
@@ -99,7 +99,8 @@ def main():
 
         return summary
     except Exception as e:
-        logger.error(f"오디오 파일 요약 중 오류가 발생했습니다: {e}", exc_info=True)
+        logger.error(
+            f"An error occurred while summarizing the audio file: {e}", exc_info=True)
         raise
 
 

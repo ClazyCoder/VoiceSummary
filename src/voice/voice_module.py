@@ -3,13 +3,14 @@ from whisperx.diarize import DiarizationPipeline
 import gc
 import torch
 import logging
+import os
 
 
 def format_transcript(segments):
     """
-    WhisperX 결과(segments)를 받아서
-    1. 같은 화자의 연속된 발언은 합치고
-    2. 깔끔한 대본 형식(String)으로 변환
+    Formats WhisperX segments by:
+    1. Merging consecutive utterances from the same speaker
+    2. Converting to a clean transcript format (String)
     """
     if not segments:
         return ""
@@ -58,21 +59,27 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
     """
     logger = logging.getLogger(__name__)
 
-    # 입력 파라미터 검증
+    # Validate input parameters
     if not audio_path:
-        raise ValueError("audio_path가 제공되지 않았습니다.")
+        raise ValueError("audio_path is not provided.")
     if not language:
-        raise ValueError("language가 제공되지 않았습니다.")
+        raise ValueError("language is not provided.")
     if min_speakers < 1:
-        raise ValueError(f"min_speakers는 1 이상이어야 합니다. 현재 값: {min_speakers}")
+        raise ValueError(
+            f"min_speakers must be at least 1. Current value: {min_speakers}")
     if max_speakers < min_speakers:
         raise ValueError(
-            f"max_speakers는 min_speakers 이상이어야 합니다. min: {min_speakers}, max: {max_speakers}")
+            f"max_speakers must be at least min_speakers. min: {min_speakers}, max: {max_speakers}")
     if not hf_token:
-        raise ValueError("hf_token이 제공되지 않았습니다.")
+        raise ValueError("hf_token is not provided.")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    batch_size = 16  # reduce if low on GPU mem
+    try:
+        # reduce if low on GPU mem
+        batch_size = int(os.getenv("BATCH_SIZE", 16))
+    except ValueError:
+        raise ValueError(
+            f"BATCH_SIZE must be a number. Current value: {os.getenv('BATCH_SIZE')}")
     # change to "int8" if low on GPU mem (may reduce accuracy)
     compute_type = "float16"
 
@@ -85,7 +92,8 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         logger.info(f"Loading audio file: {audio_path}")
         audio = whisperx.load_audio(audio_path)
         if audio is None or len(audio) == 0:
-            raise ValueError(f"오디오 파일을 로드할 수 없거나 파일이 비어있습니다: {audio_path}")
+            raise ValueError(
+                f"Failed to load audio file or file is empty: {audio_path}")
 
         logger.info("Starting transcription...")
         result = model.transcribe(audio, batch_size=batch_size)
@@ -131,16 +139,19 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         return full_diarization
 
     except FileNotFoundError as e:
-        logger.error(f"파일을 찾을 수 없습니다: {e}")
+        logger.error(f"File not found: {e}")
         raise
     except ValueError as e:
-        logger.error(f"잘못된 입력 값: {e}")
+        logger.error(f"Invalid input value: {e}")
         raise
     except RuntimeError as e:
-        logger.error(f"런타임 오류 발생: {e}")
+        logger.error(f"Runtime error occurred: {e}")
         if "authentication" in str(e).lower() or "token" in str(e).lower():
-            raise RuntimeError(f"Hugging Face 인증 실패: {e}") from e
+            raise RuntimeError(
+                f"Hugging Face authentication failed: {e}") from e
         raise
     except Exception as e:
-        logger.error(f"오디오 처리 중 예상치 못한 오류 발생: {e}", exc_info=True)
-        raise RuntimeError(f"오디오 파일 처리 중 오류가 발생했습니다: {e}") from e
+        logger.error(
+            f"Unexpected error occurred during audio processing: {e}", exc_info=True)
+        raise RuntimeError(
+            f"An error occurred while processing the audio file: {e}") from e

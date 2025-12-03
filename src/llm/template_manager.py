@@ -13,7 +13,7 @@ class TemplateManager:
         self._load_resources()
 
     def _load_resources(self):
-        # 1. 시스템 프롬프트 로딩 (없으면 기본값)
+        # 1. Load system prompt (use default if not found)
         sys_path = self.base_dir / "system.txt"
         logger.info(f"Loading system prompt from: {sys_path}")
         if sys_path.exists():
@@ -23,7 +23,7 @@ class TemplateManager:
                 f"System prompt not found at: {sys_path} using default prompt.")
             self.system_prompt = "You are a helpful assistant."
 
-        # 2. 언어별 템플릿 로딩
+        # 2. Load language-specific templates
         template_dir = self.base_dir / "templates"
         logger.info(f"Loading templates from: {template_dir}")
         if template_dir.exists():
