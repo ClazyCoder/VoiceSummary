@@ -77,7 +77,7 @@ def main():
 
     # Validate language parameter
     supported_languages = {"en", "fr", "de", "es",
-                           "it", "pt", "nl", "pl", "ru", "zh", "ja"}
+                           "it", "pt", "nl", "pl", "ru", "zh", "ja", "ko"}
     if args.language.lower() not in supported_languages:
         logger.error(
             f"Unsupported language: {args.language}. Supported languages: {', '.join(sorted(supported_languages))}"
