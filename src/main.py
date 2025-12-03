@@ -73,20 +73,15 @@ def main():
     logger.info("Parsing speakers and transcript...")
 
     try:
-        result = parse_speakers_and_transcript(
+        transcripts = parse_speakers_and_transcript(
             args.audio_path, args.language, args.min_speakers, args.max_speakers, hf_token)
         logger.info("Parsing completed!")
         model_name = os.getenv("MODEL_NAME", "Qwen/Qwen3-8B-GGUF:Q8_0")
         llm_module = LLMModule(model_name)
-        summary = llm_module.summarize_transcript(result, args.language)
+        summary = llm_module.summarize_transcript(transcripts, args.language)
         logger.info("Summary completed!")
         logger.debug(summary)
         return summary
     except Exception as e:
         logger.error(f"오디오 파일 요약 중 오류가 발생했습니다: {e}", exc_info=True)
         raise
-
-
-if __name__ == "__main__":
-    result = main()
-    print(result)
