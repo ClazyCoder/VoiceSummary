@@ -10,39 +10,17 @@ from datetime import datetime
 
 def validate_audio_path(audio_path: str) -> None:
     """
-    Validates the audio file path and prevents path traversal.
+    Validates that the audio file exists.
 
     Args:
         audio_path (str): Audio file path to validate
 
     Raises:
         FileNotFoundError: If the file does not exist
-        ValueError: If the file extension is not supported or the path is not a file, or if path traversal is detected
     """
     path = Path(audio_path)
-    # Define the base directory for audio files
-    base_dir = Path(os.getenv("AUDIO_DIR", "audio")).resolve()
-    resolved_path = path.resolve()
-    # Prevent path traversal: ensure resolved_path is within base_dir
-    try:
-        resolved_path.relative_to(base_dir)
-    except ValueError:
-        raise ValueError(f"Path traversal detected: {audio_path} is not within {base_dir}")
-
-    if not resolved_path.exists():
+    if not path.exists():
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
-
-    if not resolved_path.is_file():
-        raise ValueError(f"The specified path is not a file: {audio_path}")
-
-    # Supported audio file extensions
-    supported_extensions = {'.mp3', '.wav', '.m4a',
-                            '.flac', '.ogg', '.opus', '.aac', '.wma'}
-    if resolved_path.suffix.lower() not in supported_extensions:
-        raise ValueError(
-            f"Unsupported audio file format: {resolved_path.suffix}. "
-            f"Supported formats: {', '.join(supported_extensions)}"
-        )
 
 
 def save_result(result: str, language: str, audio_path: str, time_stamp: str, result_type: str, ext: str) -> None:
