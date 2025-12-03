@@ -51,6 +51,20 @@ RESULTS_DIR=results
 
 # 선택: 프롬프트 템플릿 디렉토리 (기본값: src/prompts)
 PROMPTS_DIR=src/prompts
+
+# 선택: WhisperX 전사 배치 크기 (기본값: 16)
+# GPU 메모리가 부족한 경우 값을 줄이세요 (예: 8, 4)
+BATCH_SIZE=16
+
+# 선택: GPU 계산 타입 (기본값: float16)
+# GPU 메모리가 부족한 경우 "int8"로 변경하세요 (정확도가 약간 감소할 수 있음)
+# 지원 값: float16, int8
+COMPUTE_TYPE=float16
+
+# 선택: WhisperX 모델 (기본값: large-v2)
+# 사용 가능한 모델: tiny, base, small, medium, large-v2, large-v3
+# 더 큰 모델은 정확도가 높지만 더 많은 GPU 메모리가 필요합니다
+WHISPERX_MODEL=large-v2
 ```
 
 Hugging Face 토큰은 [Hugging Face 설정 페이지](https://huggingface.co/settings/tokens)에서 발급받을 수 있습니다.
