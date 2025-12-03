@@ -48,6 +48,7 @@ def main():
     parser.add_argument('--max_speakers', type=int,
                         help='Maximum number of speakers to expect in the audio', default=4)
     args = parser.parse_args()
+    dotenv.load_dotenv()
     # Ensure the 'logs' directory exists before setting up logging
     os.makedirs('logs', exist_ok=True)
     # Ensure the RESULTS_DIR directory exists before saving the results
@@ -67,7 +68,6 @@ def main():
         raise
 
     logger.info("Loading environment variables...")
-    dotenv.load_dotenv()
     hf_token = os.getenv("HF_TOKEN")
     if not hf_token:
         logger.error("HF_TOKEN 환경 변수가 설정되지 않았습니다.")
