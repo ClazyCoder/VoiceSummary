@@ -2,7 +2,6 @@
 import os
 import logging
 from langchain_ollama import ChatOllama
-import glob
 from .template_manager import TemplateManager
 
 logger = logging.getLogger(__name__)
