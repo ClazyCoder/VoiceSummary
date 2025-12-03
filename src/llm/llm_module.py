@@ -50,7 +50,7 @@ class LLMModule:
     #                     use_auth_token=hf_token)
     #     logger.info(f"LLM model downloaded successfully: {self.model_name}")
 
-    def summarize_transcript(self, transcript: list[str], language: str) -> str:
+    def summarize_transcript(self, transcript: str, language: str) -> str:
         logger.debug(f"Summarizing transcript: {transcript}")
         chain = self.template_manager.get_composed_prompt(
             language) | self.model
