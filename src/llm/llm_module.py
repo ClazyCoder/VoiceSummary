@@ -45,4 +45,4 @@ class LLMModule:
             return response.content
         except Exception as e:
             logger.error(f"LLM invocation failed: {e}", exc_info=True)
-            return f"Error: LLM invocation failed. Details: {str(e)}"
+            raise RuntimeError(f"Failed to generate summary: {str(e)}") from e
