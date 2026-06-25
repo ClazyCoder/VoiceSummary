@@ -2,6 +2,7 @@
 import os
 import logging
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from .template_manager import TemplateManager
 
 logger = logging.getLogger(__name__)
@@ -21,10 +22,14 @@ class LLMModule:
         model_type = os.getenv("MODEL_TYPE", "ollama")
         if model_type == "ollama":
             self.model = ChatOllama(model=self.model_name, base_url=os.getenv(
-                "OLLAMA_BASE_URL", "http://localhost:11434"))
+                "BASE_URL", "http://localhost:11434"))
         # TODO : Add other model types here.
         elif model_type == "chatgpt":
-            raise NotImplementedError("ChatGPT model is not implemented yet.")
+            self.model = ChatOpenAI(
+                model=self.model_name, api_key=os.getenv("OPENAI_API_KEY"))
+        elif model_type == "llamacpp" or "vllm":
+            self.model = ChatOpenAI(model=self.model_name, base_url=os.getenv(
+                "BASE_URL", "http://localhost:8080/v1"), api_key="dummy_key")
         elif model_type == "groq":
             raise NotImplementedError("Groq model is not implemented yet.")
         elif model_type == "gemini":

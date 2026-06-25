@@ -40,8 +40,8 @@ HF_TOKEN=your_huggingface_token_here
 # 선택: LLM 모델 설정 (기본값: qwen3)
 LLM_MODEL=qwen3:8b
 
-# 선택: Ollama 서버 URL (기본값: http://localhost:11434)
-OLLAMA_BASE_URL=http://localhost:11434
+# 선택: LLM 서버 URL (기본값: http://localhost:11434)
+BASE_URL=http://localhost:11434
 
 # 선택: 모델 타입 (기본값: ollama)
 MODEL_TYPE=ollama
