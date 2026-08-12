@@ -128,7 +128,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         # 3. Assign speaker labels
         logger.info("Initializing diarization pipeline...")
         diarize_model = DiarizationPipeline(
-            use_auth_token=hf_token, device=device)
+            token=hf_token, device=device)
 
         logger.info(
             f"Starting diarization (min_speakers: {min_speakers}, max_speakers: {max_speakers})...")
