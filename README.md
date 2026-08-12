@@ -73,6 +73,7 @@ Hugging Face 토큰은 [Hugging Face 설정 페이지](https://huggingface.co/se
 
 - [Segmentation](https://huggingface.co/pyannote/segmentation-3.0)
 - [Speaker-Diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
+- [speaker-diarization-community-1](https://huggingface.co/pyannote/speaker-diarization-community-1)
 
 ## 사용 방법
 
