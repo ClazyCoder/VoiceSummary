@@ -6,11 +6,22 @@ import logging
 import os
 
 
+def format_timestamp(seconds):
+    """Converts seconds (float) to HH:MM:SS format."""
+    if seconds is None:
+        return "00:00:00"
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
 def format_transcript(segments):
     """
     Formats WhisperX segments by:
     1. Merging consecutive utterances from the same speaker
-    2. Converting to a clean transcript format (String)
+    2. Adding timestamps (start -> end) for each speaker block
+    3. Converting to a clean transcript format (String)
     """
     if not segments or not all('text' in seg for seg in segments):
         return ""
@@ -19,6 +30,8 @@ def format_transcript(segments):
 
     current_speaker = segments[0].get('speaker', 'UNKNOWN')
     current_text = [segments[0]['text'].strip()]
+    current_start = segments[0].get('start')
+    current_end = segments[0].get('end')
 
     for seg in segments[1:]:
         speaker = seg.get('speaker', 'UNKNOWN')
@@ -26,13 +39,19 @@ def format_transcript(segments):
 
         if speaker == current_speaker:
             current_text.append(text)
+            current_end = seg.get('end', current_end)
         else:
+            timestamp = f"[{format_timestamp(current_start)} -> {format_timestamp(current_end)}]"
             formatted_lines.append(
-                f"{current_speaker}: {' '.join(current_text)}")
+                f"{timestamp} {current_speaker}: {' '.join(current_text)}")
             current_speaker = speaker
             current_text = [text]
+            current_start = seg.get('start')
+            current_end = seg.get('end')
 
-    formatted_lines.append(f"{current_speaker}: {' '.join(current_text)}")
+    timestamp = f"[{format_timestamp(current_start)} -> {format_timestamp(current_end)}]"
+    formatted_lines.append(
+        f"{timestamp} {current_speaker}: {' '.join(current_text)}")
 
     return "\n\n".join(formatted_lines)
 
@@ -49,7 +68,7 @@ def parse_speakers_and_transcript(audio_path: str, language: str, min_speakers: 
         hf_token (str): Hugging Face authentication token for diarization model access.
 
     Returns:
-        str: A formatted string containing the transcript with speaker labels, where each line is in the form "{speaker}: {text}". Multiple segments from the same speaker are merged, and segments are separated by double newlines.
+        str: A formatted string containing the transcript with speaker labels, where each line is in the form "[HH:MM:SS -> HH:MM:SS] {speaker}: {text}". Multiple segments from the same speaker are merged, and segments are separated by double newlines.
 
     Raises:
         FileNotFoundError: If the audio file at `audio_path` does not exist or cannot be loaded.
